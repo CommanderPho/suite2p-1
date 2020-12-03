@@ -428,6 +428,7 @@ def save_mat(parent):
                          np.expand_dims(parent.probredcell,axis=1)), axis=1),
                          'neuropil_masks': parent.neuropil_masks
                          })
+    print('done saving.')
 
 def save_merge(parent):
     print('saving to NPY')
@@ -444,6 +445,7 @@ def save_merge(parent):
             np.expand_dims(parent.probredcell,axis=1)), axis=1))
     np.save(os.path.join(parent.basename, 'neuropil_masks.npy'), parent.neuropil_masks)
     parent.notmerged = np.ones(parent.iscell.size, np.bool)
+    print('done saving.')
 
 def load_custom_mask(parent):
     name = QtGui.QFileDialog.getOpenFileName(
