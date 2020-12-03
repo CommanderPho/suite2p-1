@@ -97,6 +97,14 @@ def combined(save_folder, save=True):
         else:
             redcell0 = []
             hasred = False
+
+        if os.path.isfile(os.path.join(fpath,'neuropil_masks.npy')):
+            neuropil_masks0 = np.load(os.path.join(fpath,'neuropil_masks.npy'))
+            has_neuropil_masks = True
+        else:
+            neuropil_masks0 = []
+            has_neuropil_masks = False
+
         nn,nt = F0.shape
         if nt<Nfr:
             fcat    = np.zeros((nn,Nfr-nt), 'float32')
@@ -106,7 +114,7 @@ def combined(save_folder, save=True):
             spks0   = np.concatenate((spks0, fcat), axis=1)
             Fneu0   = np.concatenate((Fneu0, fcat), axis=1)
         if k==0:
-            F, Fneu, spks, stat, iscell, redcell = F0, Fneu0, spks0, stat0, iscell0, redcell0
+            F, Fneu, spks, stat, iscell, redcell, neuropil_masks = F0, Fneu0, spks0, stat0, iscell0, redcell0, neuropil_masks0
         else:
             F    = np.concatenate((F, F0))
             Fneu = np.concatenate((Fneu, Fneu0))
@@ -115,6 +123,9 @@ def combined(save_folder, save=True):
             iscell = np.concatenate((iscell,iscell0))
             if hasred:
                 redcell = np.concatenate((redcell,redcell0))
+            if has_neuropil_masks
+                neuropil_masks = np.concatenate((neuropil_masks, neuropil_masks0))
+
     ops['meanImg']  = meanImg
     ops['meanImgE'] = meanImgE
     if ops['nchannels']>1:
@@ -149,13 +160,18 @@ def combined(save_folder, save=True):
     else:
         redcell = np.zeros_like(iscell)
 
+    if has_neuropil_masks:
+        np.save(os.path.join(fpath, 'neuropil_masks.npy'), neuropil_masks)
+    else:
+        neuropil_masks = np.zeros_like(iscell)
+
     if save:
         np.save(os.path.join(fpath, 'F.npy'), F)
         np.save(os.path.join(fpath, 'Fneu.npy'), Fneu)
         np.save(os.path.join(fpath, 'spks.npy'), spks)
         np.save(os.path.join(fpath, 'ops.npy'), ops)
         np.save(os.path.join(fpath, 'stat.npy'), stat)
-        
+
         # save as matlab file
         if ('save_mat' in ops) and ops['save_mat']:
             matpath = os.path.join(ops['save_path'],'Fall.mat')
@@ -165,7 +181,10 @@ def combined(save_folder, save=True):
                                         'Fneu': Fneu,
                                         'spks': spks,
                                         'iscell': iscell,
-                                        'redcell': redcell})
+                                        'redcell': redcell,
+                                        'neuropil_masks': neuropil_masks})
 
-    return stat, ops, F, Fneu, spks, iscell[:,0], iscell[:,1], redcell[:,0], redcell[:,1], hasred
+    # Note that we don't need to return the neuropil_masks info, as it's not used by the GUI which is why we return anything.
+    ## Update: actually, we do, because it's loaded into the GUI to be saved out in the save to mat menu option.
+    return stat, ops, F, Fneu, spks, iscell[:,0], iscell[:,1], redcell[:,0], redcell[:,1], hasred, neuropil_masks, has_neuropil_masks
 

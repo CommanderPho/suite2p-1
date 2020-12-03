@@ -219,23 +219,13 @@ def run_plane(ops, ops_path=None):
         print('!----------- Total %0.2f sec.' % plane_times['detection'])
 
         #ops['neuropil_masks'] = neuropil_masks.reshape(neuropil_masks.shape[0], ops['Ly'], ops['Lx'])
-        ops['neuropil_masks'] = neuropil_masks.reshape(neuropil_masks.shape[0], ops['Ly'], ops['Lx'])
+        # ops['neuropil_masks'] = neuropil_masks.reshape(neuropil_masks.shape[0], ops['Ly'], ops['Lx'])
          
-
-        # Save the neuropil masks to file forcefully:
+        # Save the neuropil masks to file:
         print('!!!!!!! PHO: Saving Neuropil Masks to files...')
-        np.save(os.path.join(ops['save_path'], 'ops_bak.npy'), ops)
-        print('writing out to ops_bak.npy done!')
-        np.save(os.path.join(ops['save_path'], 'ops.npy'), ops)
-        print('writing out to ops done!')
-
-        np.save(os.path.join(ops['save_path'], 'neuropil_mask_backups.npy'), neuropil_masks)
-        print('writing out to neuropil_mask_backups.npy done!')
-        np.save(os.path.join(ops['save_path'], 'neuropil_mask_rehsaped_backups.npy'), neuropil_masks.reshape(neuropil_masks.shape[0], ops['Ly'], ops['Lx']))
-        print('writing out to neuropil_mask_rehsaped_backups.npy done!')
-        print('all saving done!')
+        np.save(os.path.join(ops['save_path'], 'neuropil_masks.npy'), neuropil_masks.reshape(neuropil_masks.shape[0], ops['Ly'], ops['Lx']))
+        print('writing out to neuropil_masks.npy done!')
         
-
         ######## ROI EXTRACTION ##############
         t11=time.time()
         print('!----------- EXTRACTION')
@@ -244,10 +234,6 @@ def run_plane(ops, ops_path=None):
         print('!----------- Total %0.2f sec.' % plane_times['extraction'])
 
 
-        
-
-
-        
         ######## ROI CLASSIFICATION ##############
         t11=time.time()
         print('----------- CLASSIFICATION')
@@ -295,7 +281,8 @@ def run_plane(ops, ops_path=None):
                     'F': F,
                     'Fneu': Fneu,
                     'spks': spks,
-                    'iscell': np.load(os.path.join(fpath, 'iscell.npy'))
+                    'iscell': np.load(os.path.join(fpath, 'iscell.npy'),
+                    'neuropil_masks': np.load(os.path.join(fpath, 'neuropil_masks.npy'))
                 }
             )
     else:

@@ -283,12 +283,22 @@ def load_files(name):
                 NN = Fcell.shape[0]
                 redcell = np.zeros((NN,), np.bool)
                 probredcell = np.zeros((NN,), np.float32)
+
+        try:
+            neuropil_masks = np.load(basename + "/neuropil_masks.npy")
+            has_neuropil_masks = True
+        except (ValueError, OSError, RuntimeError, TypeError, NameError):
+            print("no neuropil_masks found (neuropil_masks.npy)")
+            has_neuropil_masks = False
+            if goodfolder:
+                NN = Fcell.shape[0]
+                neuropil_masks = np.zeros((NN,), np.bool)
     else:
         print("incorrect file, not a stat.npy")
         return None
 
     if goodfolder:
-        return stat, ops, Fcell, Fneu, Spks, iscell, probcell, redcell, probredcell, hasred
+        return stat, ops, Fcell, Fneu, Spks, iscell, probcell, redcell, probredcell, hasred, neuropil_masks, has_neuropil_masks
     else:
         print("stat.npy found, but other files not in folder")
         return None
@@ -306,7 +316,7 @@ def load_proc(parent):
         load_again(parent, Text)
 
 def load_to_GUI(parent, basename, procs):
-    stat, ops, Fcell, Fneu, Spks, iscell, probcell, redcell, probredcell, hasred = procs
+    stat, ops, Fcell, Fneu, Spks, iscell, probcell, redcell, probredcell, hasred, neuropil_masks, has_neuropil_masks = procs
     parent.basename = basename
     parent.stat = stat
     parent.ops = ops
@@ -318,6 +328,9 @@ def load_to_GUI(parent, basename, procs):
     parent.redcell = redcell.astype(np.bool)
     parent.probredcell = probredcell
     parent.hasred = hasred
+    parent.neuropil_masks = neuropil_masks
+    parent.has_neuropil_masks = has_neuropil_masks
+
     parent.notmerged = np.ones_like(parent.iscell).astype(np.bool)
     for n in range(len(parent.stat)):
         parent.stat[n]['chan2_prob'] = parent.probredcell[n]
@@ -412,7 +425,8 @@ def save_mat(parent):
                          'iscell': np.concatenate((parent.iscell[:,np.newaxis],
                                                    parent.probcell[:,np.newaxis]), axis=1),
                          'redcell': np.concatenate((np.expand_dims(parent.redcell,axis=1),
-                         np.expand_dims(parent.probredcell,axis=1)), axis=1)
+                         np.expand_dims(parent.probredcell,axis=1)), axis=1),
+                         'neuropil_masks': parent.neuropil_masks
                          })
 
 def save_merge(parent):
@@ -428,6 +442,7 @@ def save_merge(parent):
     np.save(os.path.join(parent.basename, 'redcell.npy'),
             np.concatenate((np.expand_dims(parent.redcell,axis=1),
             np.expand_dims(parent.probredcell,axis=1)), axis=1))
+    np.save(os.path.join(parent.basename, 'neuropil_masks.npy'), parent.neuropil_masks)
     parent.notmerged = np.ones(parent.iscell.size, np.bool)
 
 def load_custom_mask(parent):
