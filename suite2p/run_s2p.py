@@ -281,7 +281,7 @@ def run_plane(ops, ops_path=None):
                     'F': F,
                     'Fneu': Fneu,
                     'spks': spks,
-                    'iscell': np.load(os.path.join(fpath, 'iscell.npy'),
+                    'iscell': np.load(os.path.join(fpath, 'iscell.npy')),
                     'neuropil_masks': np.load(os.path.join(fpath, 'neuropil_masks.npy'))
                 }
             )

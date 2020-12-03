@@ -123,7 +123,7 @@ def combined(save_folder, save=True):
             iscell = np.concatenate((iscell,iscell0))
             if hasred:
                 redcell = np.concatenate((redcell,redcell0))
-            if has_neuropil_masks
+            if has_neuropil_masks:
                 neuropil_masks = np.concatenate((neuropil_masks, neuropil_masks0))
 
     ops['meanImg']  = meanImg
