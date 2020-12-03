@@ -213,20 +213,41 @@ def run_plane(ops, ops_path=None):
 
         ######## CELL DETECTION ##############
         t11=time.time()
-        print('----------- ROI DETECTION')
+        print('!----------- ROI DETECTION')
         cell_pix, cell_masks, neuropil_masks, stat, ops = detection.detect(ops=ops, classfile=classfile)
         plane_times['detection'] = time.time()-t11
-        print('----------- Total %0.2f sec.' % plane_times['detection'])
+        print('!----------- Total %0.2f sec.' % plane_times['detection'])
+
+        #ops['neuropil_masks'] = neuropil_masks.reshape(neuropil_masks.shape[0], ops['Ly'], ops['Lx'])
+        ops['neuropil_masks'] = neuropil_masks.reshape(neuropil_masks.shape[0], ops['Ly'], ops['Lx'])
+         
+
+        # Save the neuropil masks to file forcefully:
+        print('!!!!!!! PHO: Saving Neuropil Masks to files...')
+        np.save(os.path.join(ops['save_path'], 'ops_bak.npy'), ops)
+        print('writing out to ops_bak.npy done!')
+        np.save(os.path.join(ops['save_path'], 'ops.npy'), ops)
+        print('writing out to ops done!')
+
+        np.save(os.path.join(ops['save_path'], 'neuropil_mask_backups.npy'), neuropil_masks)
+        print('writing out to neuropil_mask_backups.npy done!')
+        np.save(os.path.join(ops['save_path'], 'neuropil_mask_rehsaped_backups.npy'), neuropil_masks.reshape(neuropil_masks.shape[0], ops['Ly'], ops['Lx']))
+        print('writing out to neuropil_mask_rehsaped_backups.npy done!')
+        print('all saving done!')
+        
 
         ######## ROI EXTRACTION ##############
         t11=time.time()
-        print('----------- EXTRACTION')
+        print('!----------- EXTRACTION')
         ops, stat = extraction.extract(ops, cell_pix, cell_masks, neuropil_masks, stat)
         plane_times['extraction'] = time.time()-t11
-        print('----------- Total %0.2f sec.' % plane_times['extraction'])
+        print('!----------- Total %0.2f sec.' % plane_times['extraction'])
 
-        #ops['neuropil_masks'] = neuropil_masks.reshape(neuropil_masks.shape[0], ops['Ly'], ops['Lx'])
 
+        
+
+
+        
         ######## ROI CLASSIFICATION ##############
         t11=time.time()
         print('----------- CLASSIFICATION')
