@@ -2,6 +2,7 @@ import os
 from natsort import natsorted
 import numpy as np
 import scipy
+import pathlib
 
 
 def compute_dydx(ops1):
@@ -63,6 +64,7 @@ def combined(save_folder, save=True):
 
     Vcorr = np.zeros((LY, LX))
     Nfr = np.amax(np.array([ops['nframes'] for ops in ops1]))
+    
     for k,ops in enumerate(ops1):
         fpath = plane_folders[k]
         stat0 = np.load(os.path.join(fpath,'stat.npy'), allow_pickle=True)
@@ -104,7 +106,8 @@ def combined(save_folder, save=True):
         else:
             neuropil_masks0 = []
             has_neuropil_masks = False
-
+		print('appended plane %d to combined view'%k)
+		
         nn,nt = F0.shape
         if nt<Nfr:
             fcat    = np.zeros((nn,Nfr-nt), 'float32')
